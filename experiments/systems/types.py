@@ -27,7 +27,7 @@ class BoxModel(ABC):
     @abstractmethod
     def get_parameters(self):
         """Expose model parameters (useful for logging/metadata)."""
-    
+
     @abstractmethod
     def is_tipped(self):
         """Return True if the trajectory exhibits tipping behaviour."""

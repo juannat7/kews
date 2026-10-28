@@ -126,4 +126,3 @@ def get_bifurcation_real_system_spec(real_system_name: str) -> SystemSpec:
         f"Unknown bifurcation real system: {real_system_name}. "
         f"Available systems: {[s.bifurcation_system for s in SYSTEM_REGISTRY.values() if s.bifurcation_system]}"
     )
-

@@ -56,7 +56,7 @@ def simulate_real_bifurcation_trajectory(
     # Preserve the simulation subkey used by the paper reference.
     _, key_sim = jax.random.split(key)
 
-    
+
     # Calculate total simulation length (extended if param_end_multiplier > 1.0)
     total_len = calculate_total_len(series_len, buffer_size, param_end_multiplier)
 
@@ -130,4 +130,3 @@ def simulate_real_bifurcation_trajectory(
     )
 
     return (full_trajectory, part_trajectory)
-

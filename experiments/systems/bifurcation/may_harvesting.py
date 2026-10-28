@@ -13,10 +13,10 @@ from ..utils import extract_segment, register_dataclass_pytree
 @dataclass(frozen=True)
 class MayHarvestingConfig:
     """Configuration for May's harvesting model.
-    
+
     Based on Thomas Bury et al. (PNAS, 2021):
     dx/dt = rx(1 - x/k) - h(x^2 / (s^2 + x^2)) + sigma * noise(t)
-    
+
     where:
     - x: biomass of some population
     - k: carrying capacity
@@ -25,7 +25,7 @@ class MayHarvestingConfig:
     - r: intrinsic per capita growth rate of the population
     - sigma: noise amplitude
     - noise(t): Gaussian white noise process
-    
+
     A fold bifurcation occurs at h = 0.26 (for r=1, k=1, s=0.1).
     """
 
@@ -33,20 +33,20 @@ class MayHarvestingConfig:
     r: float = 1.0  # Intrinsic per capita growth rate
     k: float = 1.0  # Carrying capacity
     s: float = 0.1  # Nonlinear harvesting parameter
-    
+
     # Bifurcation parameter range
     h_min: float = 0.15  # Lower bound for harvesting rate
     h_max: float = 0.27  # Upper bound for harvesting rate
     h_bifurcation: float = 0.26  # Fold bifurcation point
-    
+
     # Noise parameter
     sigma: float = 0.01  # Noise amplitude
-    
+
     # Simulation parameters
     dt: float = 0.01  # Time step (Euler-Maruyama default from paper)
     t_start: float = 0.0
     t_end: float = 100.0  # Default time range
-    
+
     # Initial state
     initial_state_min: float = 0.5  # Start near stable equilibrium (for h_min, equilibrium is ~0.7-0.8)
     initial_state_max: float = 1.0  # Start near carrying capacity
@@ -60,10 +60,10 @@ class MayHarvestingConfig:
 
 class MayHarvestingModel(BoxModel):
     """BoxModel abstraction for May's harvesting model.
-    
+
     Implements the stochastic harvesting model:
     dx/dt = rx(1 - x/k) - h(x^2 / (s^2 + x^2)) + σξ(t)
-    
+
     where h is the bifurcation parameter that varies linearly from h_min to h_max.
     A fold bifurcation occurs at h = h_bifurcation = 0.26.
     """
@@ -95,10 +95,10 @@ class MayHarvestingModel(BoxModel):
         param_end_multiplier: float = 1.1,
     ):
         """Compute the h(t) schedule (harvesting rate).
-        
+
         For null simulations: same linear ramp as forced but clipped so the range from
         null_cap to critical equals the range from critical to h_max (symmetric about critical).
-        For forced simulations: 
+        For forced simulations:
           - h increases linearly from h_min to h_max (up to bifurcation point)
           - Beyond the bifurcation point, h stays constant at h_max
           - param_end_multiplier extends the time series, keeping h constant beyond critical point
@@ -131,7 +131,7 @@ class MayHarvestingModel(BoxModel):
         null_simulation: bool = False,
     ):
         """Sample an initial state (biomass x).
-        
+
         For null simulations, start near the stable equilibrium for h_min.
         For forced simulations, start near carrying capacity (stable for low h).
         """
@@ -159,22 +159,22 @@ class MayHarvestingModel(BoxModel):
 
     def _drift(self, x: jnp.ndarray, h: jnp.ndarray) -> jnp.ndarray:
         """Compute the drift term: rx(1 - x/k) - h(x^2 / (s^2 + x^2)).
-        
+
         Parameters
         ----------
         x : biomass
         h : harvesting rate
-        
+
         Returns
         -------
         drift : dx/dt (without noise)
         """
         # Logistic growth: rx(1 - x/k)
         logistic = self._config.r * x * (1.0 - x / self._config.k)
-        
+
         # Harvesting: h(x^2 / (s^2 + x^2))
         harvesting = h * (x**2 / (self._config.s**2 + x**2))
-        
+
         return logistic - harvesting
 
     def _simulate_path(
@@ -187,7 +187,7 @@ class MayHarvestingModel(BoxModel):
         noise: Optional[jnp.ndarray] = None,
     ):
         """Stochastic integration of May's harvesting model using Euler-Maruyama.
-        
+
         dx/dt = rx(1 - x/k) - h(x^2 / (s^2 + x^2)) + σξ(t)
         """
         if noise is None:
@@ -201,13 +201,13 @@ class MayHarvestingModel(BoxModel):
 
             # Drift: rx(1 - x/k) - h(x^2 / (s^2 + x^2))
             drift = self._drift(x, h_val)
-            
+
             # Euler-Maruyama: dx = drift * dt + noise_scale * dW
             x_next = x + drift * dt + noise_scale * noise_t
-            
+
             # Ensure biomass is non-negative
             x_next = jnp.maximum(x_next, 0.0)
-            
+
             return x_next, x_next
 
         initial_state = initial_x
@@ -231,7 +231,7 @@ class MayHarvestingModel(BoxModel):
         **kwargs
     ):
         """Simulate May's harvesting model.
-        
+
         Parameters
         ----------
         key : JAX random key
@@ -245,7 +245,7 @@ class MayHarvestingModel(BoxModel):
             Sampling interval for output
         param_end_multiplier : float, default=1.1
             Multiplier for extending simulation time beyond transition
-            
+
         Returns
         -------
         time : (total_len,) array
@@ -265,7 +265,7 @@ class MayHarvestingModel(BoxModel):
         total_time = total_len * dt_sample
         n_steps = int(total_time / self._config.dt) + 1
         time_fine = jnp.linspace(self._config.t_start, total_time, n_steps)
-        
+
         # Compute h schedule
         # For null simulations: same linear ramp as forced, cap = critical - (h_max - critical)
         # For forced simulations: h increases linearly from h_min to h_bifurcation * param_end_multiplier
@@ -294,11 +294,11 @@ class MayHarvestingModel(BoxModel):
         # Downsample to output rate
         sample_every = int(dt_sample / self._config.dt)
         indices = jnp.arange(0, n_steps, sample_every)
-        
+
         time = time_fine[indices]
         trajectory_1d = x_traj_fine[indices]
         param_values = h_t[indices]
-        
+
         # Convert to 2D trajectory [x, 0] for consistency with other models
         trajectory = jnp.stack([trajectory_1d, jnp.zeros_like(trajectory_1d)], axis=-1)
 
@@ -321,12 +321,12 @@ class MayHarvestingModel(BoxModel):
         """Locate transition index: midpoint for null, bifurcation crossing for forced."""
         if null_simulation:
             return len(param_values) // 2
-        
+
         crossed = param_values >= self._config.h_bifurcation
-        
+
         if bool(jnp.any(crossed)):
             return int(jnp.argmax(crossed))
-        
+
         return len(param_values) - 1
 
     def extract_segment(
@@ -349,4 +349,3 @@ class MayHarvestingModel(BoxModel):
         )
 
         return time_seg, traj_seg, param_seg, trans_idx_out, success
-

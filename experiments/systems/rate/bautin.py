@@ -13,9 +13,9 @@ from ..utils import extract_segment, register_dataclass_pytree
 @dataclass(frozen=True)
 class BautinConfig:
     """Configuration for the stochastic Bautin system.
-    
+
     Based on the equation:
-    dZ_t = (a + iω)[Z_t - Λ(t)]dt - b[Z_t - Λ(t)]²[Z_t - Λ(t)]dt 
+    dZ_t = (a + iω)[Z_t - Λ(t)]dt - b[Z_t - Λ(t)]²[Z_t - Λ(t)]dt
            + [Z_t - Λ(t)]⁴[Z_t - Λ(t)]dt + D₂dW₂t
     where Z_t = X_t + iY_t and Λ(t) = 0.5Λ_max[tanh(0.5Λ_max r t) + 1]
     """
@@ -44,12 +44,12 @@ class BautinModel(BoxModel):
     """BoxModel abstraction for the stochastic Bautin system.
 
     Implements the Bautin system:
-    dZ_t = (a + iω)[Z_t - Λ(t)]dt - b[Z_t - Λ(t)]²[Z_t - Λ(t)]dt 
+    dZ_t = (a + iω)[Z_t - Λ(t)]dt - b[Z_t - Λ(t)]²[Z_t - Λ(t)]dt
            + [Z_t - Λ(t)]⁴[Z_t - Λ(t)]dt + D₂dW₂t
-    
-    where Z_t = X_t + iY_t (complex state) and 
+
+    where Z_t = X_t + iY_t (complex state) and
     Λ(t) = 0.5Λ_max[tanh(0.5Λ_max r t) + 1] (time-varying forcing).
-    
+
     In Cartesian coordinates (x, y) where w = Z_t - Λ(t) = x + iy:
         dx/dt = ax - ωy - b(x²+y²)x + (x²+y²)²x + D₂ dW_x/dt
         dy/dt = ay + ωx - b(x²+y²)y + (x²+y²)²y + D₂ dW_y/dt
@@ -122,8 +122,8 @@ class BautinModel(BoxModel):
         noise: Optional[jnp.ndarray] = None,
     ):
         """Stochastic integration in Cartesian coordinates.
-        
-        Implements: dZ_t = (a + iω)[Z_t - Λ(t)]dt - b[Z_t - Λ(t)]²[Z_t - Λ(t)]dt 
+
+        Implements: dZ_t = (a + iω)[Z_t - Λ(t)]dt - b[Z_t - Λ(t)]²[Z_t - Λ(t)]dt
                     + [Z_t - Λ(t)]⁴[Z_t - Λ(t)]dt + D₂dW₂t
         where w = Z_t - Λ(t) = x + iy
         """
@@ -139,15 +139,15 @@ class BautinModel(BoxModel):
         def step(state, inputs):
             lambda_val, noise_x_t, noise_y_t = inputs
             x, y = state
-            
+
             # Compute w = Z_t - Λ(t) = (x, y) - (Λ(t), 0) = (x - Λ(t), y)
             w_x = x - lambda_val
             w_y = y
-            
+
             # Compute |w|² = w_x² + w_y²
             w_squared = w_x**2 + w_y**2
             w_fourth = w_squared**2
-            
+
             # dx/dt = ax - ωy - b(x²+y²)x + (x²+y²)²x
             # where (x, y) here refers to w = (w_x, w_y)
             dx_dt = (
@@ -157,7 +157,7 @@ class BautinModel(BoxModel):
                 + w_fourth * w_x
             )
             x_next = x + dx_dt * dt + noise_scale * noise_x_t
-            
+
             # dy/dt = ay + ωx - b(x²+y²)y + (x²+y²)²y
             dy_dt = (
                 self._config.a * w_y
@@ -277,4 +277,3 @@ class BautinModel(BoxModel):
         )
 
         return time_seg, traj_seg, param_seg, trans_idx_out, success
-

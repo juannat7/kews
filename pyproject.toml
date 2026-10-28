@@ -51,4 +51,3 @@ Paper = "https://arxiv.org/abs/2608.14716"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["kews*"]
-

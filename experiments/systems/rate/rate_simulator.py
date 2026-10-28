@@ -63,7 +63,7 @@ def simulate_rate_trajectory(
 
     # Select, setup and initialize model using unified registry
     system_spec = get_rate_system_spec(system_name)
-    
+
     config = system_spec.default_config()
     model = system_spec.create_model(config)
 

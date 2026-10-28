@@ -50,8 +50,8 @@ class SaddleNodeModel(BoxModel):
         }
 
     def _lambda_schedule(
-        self, 
-        t: jnp.ndarray, 
+        self,
+        t: jnp.ndarray,
         config: SaddleNodeConfig,
     ):
         """Compute the lambda schedule."""
@@ -60,8 +60,8 @@ class SaddleNodeModel(BoxModel):
         )
 
     def _sample_initial_state(
-        self, 
-        key: jax.random.PRNGKey, 
+        self,
+        key: jax.random.PRNGKey,
         config: SaddleNodeConfig,
     ):
         """Sample an initial state from the uniform distribution."""
@@ -99,7 +99,7 @@ class SaddleNodeModel(BoxModel):
         _, x_tail = lax.scan(step, initial_state, (lambda_t[:-1], noise))
         x0 = jnp.full((1,), initial_state, dtype=lambda_t.dtype)
         return jnp.concatenate([x0, x_tail], axis=0)
-    
+
 
     def simulate(
         self,
@@ -111,7 +111,7 @@ class SaddleNodeModel(BoxModel):
         null_simulation: bool = False,
     ):
         """Simulate the saddle-node system.
-        
+
         For null_simulation=True, same ramp formula but epsilon at 50% (slower rate).
         """
         key_noise, key_ic = jax.random.split(key)

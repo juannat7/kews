@@ -32,10 +32,10 @@ def calculate_total_len(
     param_end_multiplier: float = 1.1
 ) -> int:
     """Calculate total simulation length with optional extension.
-    
+
     For simulations with param_end_multiplier > 1.0, extends the simulation time
     to ensure enough points before transition (forced) or after transition (null).
-    
+
     Parameters
     ----------
     series_len : int
@@ -44,7 +44,7 @@ def calculate_total_len(
         Extra samples simulated prior to the transition
     param_end_multiplier : float, default=1.1
         Multiplier for extending simulation time beyond transition
-        
+
     Returns
     -------
     int
@@ -81,4 +81,3 @@ def extract_segment(
         params_out = params[:series_len]
 
     return time_out, trajectory_out, params_out, transition_idx, success
-
