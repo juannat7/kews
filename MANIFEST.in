@@ -1,0 +1,8 @@
+include README.md LICENSE.txt
+recursive-include examples *.md *.ipynb
+recursive-include experiments *.py *.md *.ipynb
+prune experiments/empirical/data
+prune experiments/amoc/data
+include experiments/amoc/data/amoc_si_mldmax_2Juan.nc
+recursive-include scripts *.py
+global-exclude __pycache__ *.py[cod]

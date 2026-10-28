@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kews"
+version = "0.1.0"
+description = "Koopman operator early warning signals"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE.txt"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering",
+]
+authors = [
+    {name = "Juan Nathaniel", email = "jn2808@columbia.edu"},
+]
+dependencies = [
+    "flax==0.12.4",
+    "jax==0.9.0.1",
+    "jaxlib==0.9.0.1",
+    "optax==0.2.6",
+]
+
+[project.optional-dependencies]
+paper = [
+    "numpy==2.3.5",
+    "scipy==1.16.3",
+    "matplotlib==3.10.8",
+    "scikit-learn==1.8.0",
+    "pandas==3.0.0",
+    "xarray==2026.1.0",
+    "netCDF4==1.7.3",
+    "cmocean==4.0.3",
+    "requests==2.32.5",
+    "tqdm==4.67.1",
+    "jupyterlab==4.5.0",
+    "nbconvert==7.16.6",
+    "ipykernel==7.1.0",
+]
+dev = ["build>=1.2", "twine>=6"]
+
+[project.urls]
+Homepage = "https://github.com/juannat7/kews"
+Issues = "https://github.com/juannat7/kews/issues"
+Paper = "https://arxiv.org/abs/2608.14716"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["kews*"]
+

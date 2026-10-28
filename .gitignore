@@ -1,0 +1,15 @@
+*.egg-info/
+.ipynb_checkpoints/
+.pytest_cache/
+__pycache__/
+build/
+dist/
+.venv/
+.env
+.env.*
+.pypirc
+outputs/
+data/
+!experiments/amoc/data/
+experiments/amoc/data/*
+!experiments/amoc/data/amoc_si_mldmax_2Juan.nc
