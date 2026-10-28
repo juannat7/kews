@@ -12,6 +12,17 @@
 
 </div>
 
+## Contents
+
+- [Abstract](#abstract)
+- [Installation](#installation)
+- [Quickstart: bifurcation-induced tipping](#quickstart-bifurcation-induced-tipping)
+- [Quickstart: rate-induced tipping](#quickstart-rate-induced-tipping)
+- [Additional guides](#additional-guides)
+  - [Observable choices](#observable-choices)
+  - [Spectral diagnostics](#spectral-diagnostics)
+- [Citation](#citation)
+
 ## Abstract
 
 Abrupt transitions in complex systems are often preceded by early warning signals. However, most indicators rely on the notion of critical slowing down and do not generally extend to rate-induced tipping where transitions can occur without local loss of stability. This is problematic in stochastic, nonautonomous systems where internal variability and time-varying variables interact to shape tipping onset.
