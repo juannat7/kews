@@ -5,11 +5,10 @@
 <div align="center">
 
 [![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![JAX](https://img.shields.io/badge/JAX-0.9-000000)](https://docs.jax.dev/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/juannat7/kews/blob/main/LICENSE.txt)
+[![arXiv](https://img.shields.io/badge/arXiv-2608.14716-b31b1b.svg)](https://arxiv.org/abs/2608.14716)
 [![PyPI version](https://img.shields.io/pypi/v/kews)](https://pypi.org/project/kews/)
 [![PyPI downloads](https://img.shields.io/pypi/dm/kews)](https://pypi.org/project/kews/)
-[![arXiv](https://img.shields.io/badge/arXiv-2608.14716-b31b1b.svg)](https://arxiv.org/abs/2608.14716)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/juannat7/kews/blob/main/LICENSE.txt)
 
 </div>
 
@@ -41,9 +40,9 @@ pip install -e ".[paper,dev]"
 
 Reproduction instructions are in [examples](https://github.com/juannat7/kews/tree/main/examples) for the model systems and [experiments](https://github.com/juannat7/kews/tree/main/experiments) for the coupled AMOC and empirical cases.
 
-## Quickstart
+## Quickstart: bifurcation-induced tipping
 
-Compute rolling ResKMD residuals from a scalar time series:
+We show the base form of our Koopman early warning signal, suited to bifurcation-induced tipping and computed from the observed state. Compute rolling ResKMD residuals from a scalar time series; the noisy sinusoid below illustrates the API:
 
 ```python
 import jax.numpy as jnp
@@ -66,9 +65,9 @@ signal = kews.resdmd(
 print(signal.shape)  # (100,)
 ```
 
-## Control-aware residuals
+## Quickstart: rate-induced tipping
 
-Pass a control time series aligned with the state:
+Rate-induced tipping depends on how a control or forcing variable changes over time. We implement the control-aware ResKMD algorithm by passing a control time series alongside the observed state. The control must be sampled at the same times as the state. Building on the previous example:
 
 ```python
 control = jnp.linspace(-1, 1, state.size)
@@ -80,9 +79,11 @@ controlled_signal = kews.resdmd(
 )
 ```
 
-## Observable choices
+## Additional guides
 
-Use fixed random Fourier features instead of delay coordinates:
+### Observable choices
+
+The observable dictionary maps the state into features used to approximate its dynamics. The quickstarts use time-delay coordinates, which combine recent observations. For a nonlinear dictionary without training, use random Fourier features:
 
 ```python
 from kews.observables import rff
@@ -94,7 +95,7 @@ random_signal = kews.resdmd(
 )
 ```
 
-The random basis stays fixed across windows. An autoencoder can learn the features:
+The random basis stays fixed across windows, and `seed` makes it reproducible. Alternatively, an autoencoder can learn a compact representation from the data. `hidden_layers` sets the network widths, and `bottleneck_dim` sets the number of learned features:
 
 ```python
 from kews.observables import mlp
@@ -109,14 +110,17 @@ learned_signal = kews.resdmd(
 
 Training uses only the first window; the encoder is then frozen. Create a new observable for each independent fit. Paper notebooks specify their full training settings.
 
-## Spectral diagnostics
+### Spectral diagnostics
+
+Inspect the fitted Koopman spectrum to characterize decay and oscillation timescales. This example fits an operator to the full state series, converts its discrete eigenvalues to continuous-time generator eigenvalues, and summarizes the slowest non-constant mode:
 
 ```python
 from kews import diagnostics
 
 fit = diagnostics.fit_operator(state, observable=time_delay(10), rank=0.9)
-generator = diagnostics.generator_eigenvalues(fit["eigvals"], dt=1.0)
-dominant = diagnostics.dominant_mode(generator, dt=1.0)
+dt = float(time[1] - time[0])  # Sampling interval
+generator = diagnostics.generator_eigenvalues(fit["eigvals"], dt=dt)
+dominant = diagnostics.dominant_mode(generator, dt=dt)
 ```
 
 `dt` is the sampling interval in the units of the input data. The mode summary includes decay rate, oscillation period, and e-folding time.
