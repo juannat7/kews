@@ -7,7 +7,7 @@
 [![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![arXiv](https://img.shields.io/badge/arXiv-2608.14716-b31b1b.svg)](https://arxiv.org/abs/2608.14716)
 [![PyPI version](https://img.shields.io/pypi/v/kews)](https://pypi.org/project/kews/)
-[![PyPI downloads](https://img.shields.io/pypi/dm/kews)](https://pypi.org/project/kews/)
+[![PyPI downloads](https://static.pepy.tech/personalized-badge/kews?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=Downloads)](https://pepy.tech/projects/kews)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/juannat7/kews/blob/main/LICENSE.txt)
 
 </div>
